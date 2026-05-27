@@ -1,0 +1,5 @@
+mcp[cli]>=1.0.0
+minio>=7.2.0
+starlette>=0.27.0
+uvicorn>=0.24.0
+python-dotenv>=1.0.0

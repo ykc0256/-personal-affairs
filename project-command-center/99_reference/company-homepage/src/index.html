@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GWD 기반 WATER AI 홈페이지 리뉴얼</title>
+    <link rel="stylesheet" href="src/styles/site.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <span>GWD / WATER AI</span>
+        Homepage Renewal
+      </div>
+      <nav class="nav" aria-label="주요 메뉴">
+        <a href="#vision">Vision</a>
+        <a href="#platform">Platform</a>
+        <a href="#minutes">Minutes</a>
+        <a href="docs/reference/homepage-renewal-scenario.md">Scenario</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Generative Water Design</p>
+          <h1>GWD에서 시작되는 WATER AI 플랫폼 고도화</h1>
+          <p class="hero-copy">
+            개발 완료된 설계 엔진을 기반으로 공정 계산, 3D 레이아웃, 도면, 물량,
+            비용 산출을 연결하고 고객 제공성을 높이는 방향으로 리뉴얼합니다.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#platform">리뉴얼 방향 보기</a>
+            <a class="button" href="content/meeting-minutes/_template.md">회의록 템플릿</a>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="GWD 핵심 연결 항목">
+          <div class="metric"><strong>Process</strong><span>공정 계산과 설계 조건 연결</span></div>
+          <div class="metric"><strong>3D Layout</strong><span>공간 배치와 설비 구성 검토</span></div>
+          <div class="metric"><strong>Drawing</strong><span>도면과 산출물의 일관성 확보</span></div>
+          <div class="metric"><strong>CAPEX/OPEX</strong><span>물량과 비용 산출 흐름 고도화</span></div>
+        </div>
+      </section>
+
+      <section id="vision" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Renewal Direction</p>
+          <h2>미래 기술 소개보다 현재 진행 중인 고도화 작업을 선명하게 보여줍니다.</h2>
+          <p>
+            기존 WATER AI 세계관은 유지하되 홈페이지의 중심 메시지는 GWD 기반 설계
+            자동화와 서비스화 준비로 이동합니다.
+          </p>
+        </div>
+
+        <div class="flow">
+          <article>
+            <h3>산업 문제</h3>
+            <p>수처리 설계 과정의 반복 계산, 도면 수정, 산출물 불일치를 줄이는 문제에서 출발합니다.</p>
+          </article>
+          <article>
+            <h3>GWD 엔진</h3>
+            <p>공정 계산 결과가 3D 레이아웃, 도면, 물량, 비용 산출로 이어지는 구조를 제시합니다.</p>
+          </article>
+          <article>
+            <h3>서비스화</h3>
+            <p>즉시 판매 메시지보다 사용성 개선, 온보딩, 파일럿, 기술 협력 가능성을 강조합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="platform" class="section alt">
+        <div class="proof-grid">
+          <img src="public/assets/reference/page_3.png" alt="GWD 기반 설계 자동화 참고 화면" />
+          <div>
+            <p class="eyebrow">WAI and GWD</p>
+            <h2>GWD는 WATER AI 안에서 설계 단계를 담당하는 핵심 실행 엔진입니다.</h2>
+            <ul class="proof-list">
+              <li>WATER AI는 설계, 조달, 시공, 운영, 재설계까지 이어지는 상위 플랫폼입니다.</li>
+              <li>GWD는 설계 단계에서 공정 계산과 산출물을 연결하는 엔진으로 설명합니다.</li>
+              <li>운영 데이터가 다시 설계 기준 개선으로 환류되는 방향성을 함께 보여줍니다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="minutes" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Repository Content</p>
+          <h2>회의록과 리뉴얼 자료를 레포에서 함께 관리합니다.</h2>
+          <p>
+            회의록은 Markdown으로 업로드하고, 원본 시나리오와 이미지 레퍼런스는
+            `docs/reference`에 보존합니다.
+          </p>
+        </div>
+
+        <ul class="minutes-list" data-minutes-list></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>GWD / WATER AI Homepage Renewal Repository</span>
+    </footer>
+
+    <script src="src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["bkt_vender_db"]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model attachments {
+  attachment_id String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ref_type      String         @db.VarChar(30)
+  ref_id        String         @db.Uuid
+  file_name     String         @db.VarChar(300)
+  storage_path  String         @db.VarChar(500)
+  file_size     BigInt?
+  mime_type     String?        @db.VarChar(100)
+  upload_id     String?        @db.Uuid
+  uploaded_by   String?        @db.Uuid
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  excel_uploads excel_uploads? @relation(fields: [upload_id], references: [upload_id], onDelete: NoAction, onUpdate: NoAction)
+  users         users?         @relation(fields: [uploaded_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("bkt_vender_db")
+}
+
+model design_prices {
+  design_price_id String         @id(map: "proposal_prices_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_id       String         @db.Uuid
+  equipment_id    String         @db.Uuid
+  price           Decimal        @db.Decimal(15, 2)
+  currency        String         @default("KRW") @db.VarChar(3)
+  price_date      DateTime       @db.Date
+  source          String?        @db.VarChar(100)
+  note            String?
+  upload_id       String?        @db.Uuid
+  updated_at      DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_by      String?        @db.Uuid
+  is_voided       Boolean        @default(false)
+  void_reason     String?
+  created_at      DateTime       @default(now()) @db.Timestamptz(6)
+  created_by      String?        @db.Uuid
+  users           users?         @relation(fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "proposal_prices_created_by_fkey")
+  excel_uploads   excel_uploads? @relation(fields: [upload_id], references: [upload_id], onDelete: NoAction, onUpdate: NoAction, map: "proposal_prices_upload_id_fkey")
+  vendor_items    vendor_items   @relation(fields: [vendor_id, equipment_id], references: [vendor_id, equipment_id], onDelete: NoAction, onUpdate: NoAction, map: "proposal_prices_vendor_id_equipment_id_fkey")
+
+  @@schema("bkt_vender_db")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model equipment_categories {
+  category_id                String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_category_id         String?                @db.Uuid
+  category_code              String                 @unique @db.VarChar(20)
+  category_name              String                 @db.VarChar(100)
+  depth                      Int
+  sort_order                 Int                    @default(0)
+  is_active                  Boolean                @default(true)
+  equipment_categories       equipment_categories?  @relation("equipment_categoriesToequipment_categories", fields: [parent_category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  other_equipment_categories equipment_categories[] @relation("equipment_categoriesToequipment_categories")
+  equipments                 equipments[]
+
+  @@schema("bkt_vender_db")
+}
+
+model equipments {
+  equipment_id                       String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id                        String?               @db.Uuid
+  equipment_code                     String                @unique @db.VarChar(30)
+  model_name                         String?               @db.VarChar(200)
+  manufacturer_model_no              String?               @db.VarChar(100)
+  specification                      String?
+  unit                               String?               @db.VarChar(20)
+  gwd_equipment_id                   String?               @unique @db.VarChar(50)
+  is_active                          Boolean               @default(true)
+  notes                              String?
+  created_at                         DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at                         DateTime              @default(now()) @db.Timestamptz(6)
+  created_by                         String?               @db.Uuid
+  updated_by                         String?               @db.Uuid
+  equipment_categories               equipment_categories? @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  users_equipments_created_byTousers users?                @relation("equipments_created_byTousers", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_equipments_updated_byTousers users?                @relation("equipments_updated_byTousers", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendor_items                       vendor_items[]
+
+  @@schema("bkt_vender_db")
+}
+
+model evaluation_criteria {
+  criteria_id       String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  criteria_name     String              @db.VarChar(100)
+  weight            Decimal?            @db.Decimal(5, 2)
+  max_score         Int
+  description       String?
+  sort_order        Int                 @default(0)
+  is_active         Boolean             @default(true)
+  evaluation_scores evaluation_scores[]
+
+  @@schema("bkt_vender_db")
+}
+
+model evaluation_scores {
+  score_id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  evaluation_id       String              @db.Uuid
+  criteria_id         String              @db.Uuid
+  score               Decimal             @db.Decimal(5, 2)
+  comment             String?
+  updated_at          DateTime?           @default(now()) @db.Timestamptz(6)
+  updated_by          String?             @db.Uuid
+  evaluation_criteria evaluation_criteria @relation(fields: [criteria_id], references: [criteria_id], onDelete: NoAction, onUpdate: NoAction)
+  vendor_evaluations  vendor_evaluations  @relation(fields: [evaluation_id], references: [evaluation_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([evaluation_id, criteria_id])
+  @@schema("bkt_vender_db")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model excel_uploads {
+  upload_id         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  upload_type       String              @db.VarChar(20)
+  file_name         String              @db.VarChar(300)
+  uploaded_by       String?             @db.Uuid
+  row_total         Int?
+  row_success       Int?
+  row_fail          Int?
+  status            String?             @db.VarChar(20)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  attachments       attachments[]
+  design_prices     design_prices[]
+  users             users?              @relation(fields: [uploaded_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  execution_prices  execution_prices[]
+  upload_error_rows upload_error_rows[]
+
+  @@schema("bkt_vender_db")
+}
+
+model execution_prices {
+  execution_price_id String         @id(map: "design_prices_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_id          String         @db.Uuid
+  equipment_id       String         @db.Uuid
+  price              Decimal        @db.Decimal(15, 2)
+  currency           String         @default("KRW") @db.VarChar(3)
+  price_date         DateTime       @db.Date
+  source             String?        @db.VarChar(100)
+  note               String?
+  upload_id          String?        @db.Uuid
+  updated_at         DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_by         String?        @db.Uuid
+  is_voided          Boolean        @default(false)
+  void_reason        String?
+  created_at         DateTime       @default(now()) @db.Timestamptz(6)
+  created_by         String?        @db.Uuid
+  users              users?         @relation(fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "design_prices_created_by_fkey")
+  excel_uploads      excel_uploads? @relation(fields: [upload_id], references: [upload_id], onDelete: NoAction, onUpdate: NoAction, map: "design_prices_upload_id_fkey")
+  vendor_items       vendor_items   @relation(fields: [vendor_id, equipment_id], references: [vendor_id, equipment_id], onDelete: NoAction, onUpdate: NoAction, map: "design_prices_vendor_id_equipment_id_fkey")
+
+  @@schema("bkt_vender_db")
+}
+
+model upload_error_rows {
+  error_row_id  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  upload_id     String        @db.Uuid
+  row_no        Int
+  error_message String
+  raw_data      Json?
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  excel_uploads excel_uploads @relation(fields: [upload_id], references: [upload_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("bkt_vender_db")
+}
+
+model user_roles {
+  role_id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role_name                String   @unique @db.VarChar(50)
+  description              String?
+  is_system                Boolean  @default(false)
+  can_manage_users         Boolean  @default(false)
+  can_manage_categories    Boolean  @default(false)
+  can_manage_equipment     Boolean  @default(false)
+  can_manage_vendors       Boolean  @default(false)
+  can_manage_prices        Boolean  @default(false)
+  can_view_execution_price Boolean  @default(false)
+  can_manage_evaluations   Boolean  @default(false)
+  can_access_admin         Boolean  @default(false)
+  sort_order               Int      @default(0)
+  created_at               DateTime @default(now()) @db.Timestamptz(6)
+  users                    users[]
+
+  @@schema("bkt_vender_db")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  user_id                                                   String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                                                  String               @unique @db.VarChar(50)
+  email                                                     String               @unique @db.VarChar(200)
+  password_hash                                             String               @db.VarChar(255)
+  role                                                      String               @db.VarChar(20)
+  role_id                                                   String?              @db.Uuid
+  display_name                                              String?              @db.VarChar(100)
+  is_active                                                 Boolean              @default(true)
+  last_login_at                                             DateTime?            @db.Timestamptz(6)
+  created_at                                                DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at                                                DateTime             @default(now()) @db.Timestamptz(6)
+  attachments                                               attachments[]
+  design_prices                                             design_prices[]
+  equipments_equipments_created_byTousers                   equipments[]         @relation("equipments_created_byTousers")
+  equipments_equipments_updated_byTousers                   equipments[]         @relation("equipments_updated_byTousers")
+  excel_uploads                                             excel_uploads[]
+  execution_prices                                          execution_prices[]
+  vendor_evaluations_vendor_evaluations_evaluator_idTousers vendor_evaluations[] @relation("vendor_evaluations_evaluator_idTousers")
+  vendor_evaluations_vendor_evaluations_updated_byTousers   vendor_evaluations[] @relation("vendor_evaluations_updated_byTousers")
+  vendors_vendors_created_byTousers                         vendors[]            @relation("vendors_created_byTousers")
+  vendors_vendors_updated_byTousers                         vendors[]            @relation("vendors_updated_byTousers")
+  user_roles                                                user_roles?          @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("bkt_vender_db")
+}
+
+model vendor_evaluations {
+  evaluation_id                                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_id                                    String              @db.Uuid
+  evaluation_date                              DateTime            @db.Date
+  evaluator_id                                 String?             @db.Uuid
+  total_score                                  Decimal?            @db.Decimal(5, 2)
+  grade                                        String?             @db.VarChar(10)
+  notes                                        String?
+  created_at                                   DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at                                   DateTime            @default(now()) @db.Timestamptz(6)
+  updated_by                                   String?             @db.Uuid
+  evaluation_scores                            evaluation_scores[]
+  users_vendor_evaluations_evaluator_idTousers users?              @relation("vendor_evaluations_evaluator_idTousers", fields: [evaluator_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_vendor_evaluations_updated_byTousers   users?              @relation("vendor_evaluations_updated_byTousers", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  vendors                                      vendors             @relation(fields: [vendor_id], references: [vendor_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("bkt_vender_db")
+}
+
+model vendor_items {
+  vendor_item_id   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_id        String             @db.Uuid
+  equipment_id     String             @db.Uuid
+  dealer_name      String?            @db.VarChar(200)
+  is_active        Boolean            @default(true)
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  design_prices    design_prices[]
+  execution_prices execution_prices[]
+  equipments       equipments         @relation(fields: [equipment_id], references: [equipment_id], onDelete: NoAction, onUpdate: NoAction)
+  vendors          vendors            @relation(fields: [vendor_id], references: [vendor_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([vendor_id, equipment_id])
+  @@schema("bkt_vender_db")
+}
+
+model vendor_types {
+  type_id    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type_name  String   @db.VarChar(100)
+  sort_order Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("bkt_vender_db")
+}
+
+model countries {
+  country_id   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  country_name String   @db.VarChar(100)
+  sort_order   Int      @default(0)
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("bkt_vender_db")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vendors {
+  vendor_id                       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_code                     String               @unique @db.VarChar(20)
+  vendor_name                     String               @db.VarChar(200)
+  vendor_type                     String?              @db.VarChar(20)
+  country                         String?              @db.VarChar(50)
+  business_no                     String?              @db.VarChar(20)
+  contact_info                    Json?
+  financial_grade                 String?              @db.VarChar(20)
+  revenue                         BigInt?
+  capital_size                    BigInt?
+  revenue_base_year               Int?
+  gwd_vendor_id                   String?              @unique @db.VarChar(50)
+  is_active                       Boolean              @default(true)
+  notes                           String?
+  created_at                      DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at                      DateTime             @default(now()) @db.Timestamptz(6)
+  created_by                      String?              @db.Uuid
+  updated_by                      String?              @db.Uuid
+  vendor_evaluations              vendor_evaluations[]
+  vendor_items                    vendor_items[]
+  users_vendors_created_byTousers users?               @relation("vendors_created_byTousers", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_vendors_updated_byTousers users?               @relation("vendors_updated_byTousers", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("bkt_vender_db")
+}

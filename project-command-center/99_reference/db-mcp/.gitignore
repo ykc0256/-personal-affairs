@@ -1,0 +1,21 @@
+# 환경변수 (절대 커밋 금지)
+.env
+
+# MCP 설정 (접속 정보 포함, 절대 커밋 금지)
+.mcp.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

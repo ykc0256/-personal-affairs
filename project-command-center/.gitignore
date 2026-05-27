@@ -1,0 +1,16 @@
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporary files
+~$*
+*.tmp
+*.bak
+
+# Local exports
+exports/
+
+# MCP 설정 (DB 접속 비밀번호 포함 — git 제외)
+.mcp.json
+

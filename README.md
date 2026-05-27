@@ -1,6 +1,36 @@
 # -personal-affairs
 
-Personal affairs workspace containing:
+개인 업무와 프로젝트 자료를 한 곳에서 관리하는 저장소입니다.
 
-- `project-command-center`
-- `vendor-item-db`
+## 폴더 구성
+
+| 폴더 | 설명 |
+| --- | --- |
+| `project-command-center` | 일정, 프로젝트 진행 현황, 회의록, 참고자료를 정리하는 업무 관리 공간 |
+| `vendor-item-db` | 협력사 및 품목 데이터베이스 웹 애플리케이션 프로젝트 |
+
+## 주요 내용
+
+- 프로젝트별 진행 상황과 산출물 정리
+- 회의록, 요구사항, 설계 문서 보관
+- Vendor/Item DB 애플리케이션 소스 코드 관리
+- 참고자료와 업무 자동화 관련 문서 관리
+
+## 관리 메모
+
+이 저장소에는 두 프로젝트를 하위 폴더 형태로 묶어 올렸습니다. 각 원본 폴더의 `.git`, `node_modules`, `.next`, `.env`, 로그 파일 등 로컬 전용 파일은 제외했습니다.
+
+추가 변경사항을 GitHub에 반영할 때는 저장소 루트에서 아래 순서로 실행합니다.
+
+```powershell
+git status
+git add .
+git commit -m "update"
+git push
+```
+
+## 주의사항
+
+- 민감 정보나 API 토큰은 커밋하지 않습니다.
+- 50MB가 넘는 문서 파일은 GitHub에서 경고가 날 수 있습니다.
+- 실행 환경 파일은 필요 시 `.env.example` 형태로 별도 작성합니다.
